@@ -7,8 +7,13 @@ import os
 import requests
 from pynput.keyboard import Key, Listener,Controller
 
+downLoadPath= 'D:\\'
+username='18697265816'
+password='5816@smartEDU'
+loginUrl='https://auth.smartedu.cn/uias/login'
+
 #文件下载函数
-def pdfDownloader(url):
+def pdfDownloader(url,filenameEle):
     try:
     # 发送 HTTP 请求并获取文件内容
         response = requests.get(url)
@@ -16,9 +21,9 @@ def pdfDownloader(url):
         # 检查请求是否成功
         if response.status_code == 200:
             # 获取文件名
-            file_name = os.path.basename(url)
+            file_name = filenameEle+os.path.basename(url)
             # 构建文件保存路径（D 盘根目录）
-            save_path = os.path.join('D:\\', file_name)
+            save_path = os.path.join(downLoadPath, file_name)
             # 保存文件
             with open(save_path, 'wb') as file:
                 file.write(response.content)
@@ -33,14 +38,14 @@ def pdfDownloader(url):
 driver = webdriver.Chrome()  # 请确保已安装 Chrome 浏览器和对应的 ChromeDriver
 
 # 打开登录页面
-driver.get('https://auth.smartedu.cn/uias/login')
+driver.get(loginUrl)
 
 # 输入用户名和密码
 username_input = driver.find_element(By.ID, 'username')  # 根据实际的用户名输入框 ID 进行修改
-username_input.send_keys('18697265816')  # 替换为您的用户名
+username_input.send_keys(username)  # 替换为您的用户名
 
 password_input = driver.find_element(By.ID, 'tmpPassword')  # 根据实际的密码输入框 ID 进行修改
-password_input.send_keys('5816@smartEDU')  # 替换为您的密码
+password_input.send_keys(password)  # 替换为您的密码
 
 # 找到 agreementCheckbox 元素并点击
 agreement_checkbox = driver.find_element(By.ID, 'agreementCheckbox')  # 根据实际的元素 ID 进行修改
@@ -60,12 +65,13 @@ def on_press(key):
         #获取下载连接目标                
         try:
             element = driver.find_element(By.ID, 'pdfPlayerFirefox')
+            filenameEle = driver.find_element(By.CLASS_NAME,'index-module_title_bnE9V').text
             match = re.search(r'file=(.*?\.pdf)', element.get_attribute('src'))
             if match:
                 new_rul= match.group(1)
                 new_url = new_rul.replace('-private', '')
                 print("匹配的下载目标为：",new_url)
-                pdfDownloader(new_url)
+                pdfDownloader(new_url,filenameEle)
             else:
                 print("未找到匹配的内容")
         except Exception:
