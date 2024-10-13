@@ -55,13 +55,11 @@ agreement_checkbox.click()
 keyboard = Controller()
 
 def on_press(key):
-    if key == Key.alt_l:
-        # 获取当前所有窗口的句柄
-        handles = driver.window_handles
+    if hasattr(key, 'char') and key.char == 'p':
+        # 使用 active_element 属性获取当前具有焦点的元素
+        driver.switch_to.window(driver.window_handles[-1])
 
-        # 切换到当前焦点的标签页，通常是最新打开或操作过的
-        driver.switch_to.window(handles[len(handles)-1])
-        print("Alt 键被按下，当前页面 URL: ", driver.current_url)
+        print("快捷键被按下，当前页面 URL: ", driver.current_url)
         #获取下载连接目标                
         try:
             element = driver.find_element(By.ID, 'pdfPlayerFirefox')
@@ -76,6 +74,9 @@ def on_press(key):
                 print("未找到匹配的内容")
         except Exception:
             print("未找到具有 'pdfPlayerFirefox' ID 的元素")
+    elif not hasattr(key, 'char'):
+        # 处理非字母按键的操作
+        pass
 
 with Listener(on_press=on_press) as listener:
     listener.join()
