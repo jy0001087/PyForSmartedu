@@ -14,6 +14,8 @@ loginUrl='https://auth.smartedu.cn/uias/login'
 
 #文件下载函数
 def pdfDownloader(url,filenameEle):
+    #删除文件名乱码
+    filenameEle = re.sub(r'[^\x00-\x7F]+', '', filenameEle)
     try:
     # 发送 HTTP 请求并获取文件内容
         response = requests.get(url)
